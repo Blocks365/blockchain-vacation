@@ -45,4 +45,4 @@ response.
 Application Files
 -----------------
 
-[VacationRequest.sol](..\ethereum\contracts\VacationRequest.sol)
+[VacationRequest.sol](ethereum/contracts/VacationRequest.sol)
