@@ -45,6 +45,4 @@ response.
 Application Files
 -----------------
 
-[Resourcing.json](Resourcing.json)
-
-[Resourcing.sol](Resourcing.sol)
+[Resourcing.sol](ethereum\contracts\VacationRequest.sol)
