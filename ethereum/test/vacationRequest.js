@@ -5,7 +5,7 @@ const PREFIX = "Returned error: VM Exception while processing transaction: ";
 contract('VacationRequest', function(accounts) {
   var electionInstance;
 
-  it("Rejects a request Invalid", async function() {
+  it("Cannot Rejects a draft vacation request", async function() {
     const instance = await VacationRequest.deployed();
     try {
       await instance.reject();
