@@ -9,6 +9,9 @@ contract('VacationRequest', function(accounts) {
     await instance.upsertDay({year: 2020, month: 2, day: 20, amount: 8});
     const count = await instance.VacationDaysCount();
     assert.equal(count, 1)
+    await instance.upsertDay({year: 2020, month: 2, day: 21, amount: 8});
+    const count2 = await instance.VacationDaysCount();
+    assert.equal(count2, 2)
   });
   
   it("Cannot Rejects a draft vacation request", async function() {
