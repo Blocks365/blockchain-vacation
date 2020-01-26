@@ -18,6 +18,11 @@ contract VacationRequest
     }
 
     function cancel() public {
+        if ( State == StateType.Accepted )
+        {
+            revert("Cannot cancel an accepted request");
+        }
+
         State = StateType.Cancelled;
     }
 
