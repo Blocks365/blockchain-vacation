@@ -42,7 +42,7 @@ contract VacationRequest {
             if(VacationDays[dayKey].year == 0 ){
                 VacationDaysCount++;
             }
-            
+
             VacationDays[dayKey] = day;
             
         }
@@ -59,13 +59,9 @@ contract VacationRequest {
         if (State == StateType.Draft || State == StateType.PendingApproval) {
             uint16 dayKey = (day.year * 12 * 31) + (day.month * 31) + day.day;
             if(VacationDays[dayKey].year > 0 ){
-                delete VacationDays[dayKey];
                 VacationDaysCount --;
             }
-            else{
-                delete VacationDays[dayKey];
-                VacationDaysCount --;
-            }
+            delete VacationDays[dayKey];
         }
         else{
             revert("Cannot modify request");
