@@ -17,6 +17,10 @@ contract VacationRequest
         State = StateType.Draft;
     }
 
+    function cancel() public {
+        State = StateType.Cancelled;
+    }
+
     function reject() public
     {
         if ( State != StateType.PendingApproval )
