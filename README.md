@@ -42,11 +42,11 @@ Workflow Details
 How to Run
 ----------
 
-Create a local instance of Ganache by running the following command in the console:
-npx ganache-cli
+Create a local instance of Ganache by running the following command in the console:  
+`npx ganache-cli`
 
-Locate the \ethereum folder and run the tests using Truffle by executing the following command in the console:
-npx truffle test
+Locate the \ethereum folder and run the tests using Truffle by executing the following command in the console:  
+`npx truffle test`
 
 
 Application Files
