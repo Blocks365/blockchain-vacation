@@ -16,4 +16,19 @@ contract VacationRequest
         Requestor = msg.sender;
         State = StateType.Draft;
     }
+
+    function reject() public
+    {
+        if ( State != StateType.PendingApproval )
+        {
+            revert("Only Status Pending Approval can be rejected");
+        }
+
+        if (Responder != msg.sender)
+        {
+            revert("Wrong sender");
+        }
+
+        State = StateType.Rejected;
+    }
 }
