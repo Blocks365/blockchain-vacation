@@ -3,7 +3,7 @@ pragma experimental ABIEncoderV2;
 
 contract VacationRequest {
     //Set of States
-    enum StateType {Draft, PendingApproval, Accepted, Rejected, Cancelled}
+    enum StateType { Draft, PendingApproval, Accepted, Rejected, Cancelled }
 
     //date struct for easy coding
     struct VacationDay {
@@ -51,6 +51,14 @@ contract VacationRequest {
         _;
     }
 
+    modifier onlyDraft {
+        require(
+            state == StateType.Draft,
+            "Cannot modify request"
+        );
+        _;
+    }
+
     function upsertDay(VacationDay memory _day)
         public
         onlyOwner
@@ -80,7 +88,10 @@ contract VacationRequest {
         delete vacationDays[dayKey];
     }
 
-    function cancel() public onlyOwner {
+    function cancel()
+        public
+        onlyOwner
+    {
         if (state == StateType.Accepted) {
             revert("Cannot cancel an accepted request");
         }
@@ -88,11 +99,44 @@ contract VacationRequest {
         state = StateType.Cancelled;
     }
 
-    function reject() public onlyPendingApproval onlyManager {
+    function reject()
+        public
+        onlyPendingApproval
+        onlyManager
+    {
         state = StateType.Rejected;
     }
 
-    function calcKey(VacationDay memory _day) internal pure returns (uint16) {
+    function submit(address _manager)
+        public
+        onlyOwner
+        onlyDraft
+    {
+        if (_manager == owner) {
+            revert("Cannot submit request to yourself");
+        }
+
+        if (vacationDaysCount == 0) {
+            revert("No vacation days added. Cannot submit empty request");
+        }
+
+        state = StateType.PendingApproval;
+        manager = _manager;
+    }
+
+    function approve()
+        public
+        onlyPendingApproval
+        onlyManager
+    {
+        state = StateType.Accepted;
+    }
+
+    function calcKey(VacationDay memory _day)
+        internal
+        pure
+        returns (uint16)
+    {
         uint16 dayKey = (_day.year * 12 * 31) + (_day.month * 31) + _day.day;
         return dayKey;
     }
