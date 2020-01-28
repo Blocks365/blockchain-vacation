@@ -1,4 +1,4 @@
-pragma solidity >=0.4.25 <0.7.0;
+pragma solidity >=0.5.0 <0.7.0;
 pragma experimental ABIEncoderV2;
 
 contract VacationRequest {
@@ -14,78 +14,86 @@ contract VacationRequest {
     }
 
     //List of properties
-    StateType public State;
-    address public Requestor; // IO
-    address public Responder; // IM
-    mapping(uint16 => VacationDay) public VacationDays;
-    uint16 public VacationDaysCount;
-    //VacationDay[] public VacationDays;
+    StateType public state = StateType.Draft; // Initial State
+    address public owner; // IO
+    address public manager; // IM
+    mapping(uint16 => VacationDay) public vacationDays; // Dates of vacation days appplying for
+    uint16 public vacationDaysCount = 0; // Totoal number of vacation days for this request
 
     // Constructor
     constructor() public {
-        Requestor = msg.sender;
-        State = StateType.Draft;
-        VacationDaysCount = 0;
+        owner = msg.sender;
     }
 
-    function upsertDay(VacationDay memory day) public {
+    modifier onlyOwner {
+        require(msg.sender == owner, "Only owner can call this function.");
+        _;
+    }
 
+    modifier onlyManager {
+        require(msg.sender == manager, "Only manager can use this function.");
+        _;
+    }
+
+    modifier onlyPendingApproval {
+        require(
+            state == StateType.PendingApproval,
+            "Only Status Pending Approval can be rejected"
+        );
+        _;
+    }
+
+    modifier onlyDraftPending {
+        require(
+            state == StateType.Draft || state == StateType.PendingApproval,
+            "Cannot modify request"
+        );
+        _;
+    }
+
+    function upsertDay(VacationDay memory _day)
+        public
+        onlyOwner
+        onlyDraftPending
+    {
         //todo: amount should  be mod 4
+        uint16 dayKey = calcKey(_day);
 
-        if(msg.sender != Requestor){
-            revert("Only the owner can modify this request");
+        if (vacationDays[dayKey].year == 0) {
+            vacationDaysCount++;
         }
 
-        if (State == StateType.Draft || State == StateType.PendingApproval) {
-            uint16 dayKey = (day.year * 12 * 31) + (day.month * 31) + day.day;
-            
-            if(VacationDays[dayKey].year == 0 ){
-                VacationDaysCount++;
-            }
-
-            VacationDays[dayKey] = day;
-            
-        }
-        else{
-            revert("Cannot modify request");
-        }
+        vacationDays[dayKey] = _day;
     }
 
-    function removeDay(VacationDay memory day) public {
-        if(msg.sender != Requestor){
-            revert("Only the owner can modify this request");
+    function removeDay(VacationDay memory _day)
+        public
+        onlyOwner
+        onlyDraftPending
+    {
+        uint16 dayKey = calcKey(_day);
+
+        if (vacationDays[dayKey].year > 0) {
+            vacationDaysCount--;
         }
 
-        if (State == StateType.Draft || State == StateType.PendingApproval) {
-            uint16 dayKey = (day.year * 12 * 31) + (day.month * 31) + day.day;
-            if(VacationDays[dayKey].year > 0 ){
-                VacationDaysCount --;
-            }
-            delete VacationDays[dayKey];
-        }
-        else{
-            revert("Cannot modify request");
-        }
+        delete vacationDays[dayKey];
     }
 
-
-    function cancel() public {
-        if (State == StateType.Accepted) {
+    function cancel() public onlyOwner {
+        if (state == StateType.Accepted) {
             revert("Cannot cancel an accepted request");
         }
 
-        State = StateType.Cancelled;
+        state = StateType.Cancelled;
     }
 
-    function reject() public {
-        if (State != StateType.PendingApproval) {
-            revert("Only Status Pending Approval can be rejected");
-        }
+    function reject() public onlyPendingApproval onlyManager {
+        state = StateType.Rejected;
+    }
 
-        if (Responder != msg.sender) {
-            revert("Wrong sender");
-        }
-
-        State = StateType.Rejected;
+    function calcKey(VacationDay memory _day) internal pure returns (uint16) {
+        uint16 dayKey = (_day.year * 12 * 31) + (_day.month * 31) + _day.day;
+        return dayKey;
     }
 }
