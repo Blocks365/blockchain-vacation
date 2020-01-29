@@ -63,7 +63,7 @@ contract('VacationRequest', function (accounts) {
       await instance.approve();
     } catch (error) {
       assert(error, "Expected an error but did not get one");
-      var message = "revert Only manager can use this function";
+      var message = "revert Only manager can call this function";
       assert(error.message.startsWith(PREFIX + message), "Expected " + message + ". But got " + error.message);
     }
   });

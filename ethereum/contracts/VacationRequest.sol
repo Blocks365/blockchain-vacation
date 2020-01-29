@@ -31,7 +31,7 @@ contract VacationRequest {
     }
 
     modifier onlyManager {
-        require(msg.sender == manager, "Only manager can use this function.");
+        require(msg.sender == manager, "Only manager can call this function.");
         _;
     }
 
