@@ -20,9 +20,13 @@ contract VacationRequest {
     mapping(uint16 => VacationDay) public vacationDays; // Dates of vacation days appplying for
     uint16 public vacationDaysCount = 0; // Totoal number of vacation days for this request
 
+    //Events
+    event RequestCreated(address indexed _owner);
+
     // Constructor
     constructor() public {
         owner = msg.sender;
+        emit RequestCreated(msg.sender);
     }
 
     modifier onlyOwner {
