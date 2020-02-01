@@ -3,7 +3,7 @@ pragma experimental ABIEncoderV2;
 
 contract VacationRequest {
     //Set of States
-    enum StateType { Draft, PendingApproval, Accepted, Rejected, Cancelled }
+    enum StateType {Draft, PendingApproval, Accepted, Rejected, Cancelled}
 
     //date struct for easy coding
     struct VacationDay {
@@ -22,6 +22,10 @@ contract VacationRequest {
 
     //Events
     event RequestCreated(address indexed _owner);
+    event RequestCancelled(address indexed _owner);
+
+    event RequestApproved(address indexed _owner, address indexed _manager);
+    event RequestRejected(address indexed _owner, address indexed _manager);
 
     // Constructor
     constructor() public {
@@ -56,10 +60,7 @@ contract VacationRequest {
     }
 
     modifier onlyDraft {
-        require(
-            state == StateType.Draft,
-            "Cannot modify request"
-        );
+        require(state == StateType.Draft, "Cannot modify request");
         _;
     }
 
@@ -92,30 +93,21 @@ contract VacationRequest {
         delete vacationDays[dayKey];
     }
 
-    function cancel()
-        public
-        onlyOwner
-    {
+    function cancel() public onlyOwner {
         if (state == StateType.Accepted) {
             revert("Cannot cancel an accepted request");
         }
 
         state = StateType.Cancelled;
+        emit RequestCancelled(owner);
     }
 
-    function reject()
-        public
-        onlyPendingApproval
-        onlyManager
-    {
+    function reject() public onlyPendingApproval onlyManager {
         state = StateType.Rejected;
+        emit RequestRejected(owner, manager);
     }
 
-    function submit(address _manager)
-        public
-        onlyOwner
-        onlyDraft
-    {
+    function submit(address _manager) public onlyOwner onlyDraft {
         if (_manager == owner) {
             revert("Cannot submit request to yourself");
         }
@@ -128,19 +120,12 @@ contract VacationRequest {
         manager = _manager;
     }
 
-    function approve()
-        public
-        onlyPendingApproval
-        onlyManager
-    {
+    function approve() public onlyPendingApproval onlyManager {
         state = StateType.Accepted;
+        emit RequestApproved(owner, manager);
     }
 
-    function calcKey(VacationDay memory _day)
-        internal
-        pure
-        returns (uint16)
-    {
+    function calcKey(VacationDay memory _day) internal pure returns (uint16) {
         uint16 dayKey = (_day.year * 12 * 31) + (_day.month * 31) + _day.day;
         return dayKey;
     }
