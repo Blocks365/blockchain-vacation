@@ -33,13 +33,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  String ownerAddress = '0xD214cEE4caf198a72C55b169f7AbB88Cb58dCfac';
 
-  void _incrementCounter(BuildContext context) {
-    setState(() {
-      _counter++;
-      Navigator.of(context).pushNamed('/second');
-    });
+  Future<void> sendRequest(BuildContext context) async {
+    var newCommand = Firestore.instance
+        .collection('requests')
+        .document(ownerAddress)
+        .collection('commands')
+        .document();
+    await newCommand.setData(
+      {
+        'command': 'VacationRequest',
+        'data': {
+          'amount': '16',
+        },
+      },
+    );
   }
 
   @override
@@ -50,8 +59,8 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: _buildBody(context),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _incrementCounter(context);
+        onPressed: () async {
+          await sendRequest(context);
         },
         tooltip: 'Increment',
         child: Icon(Icons.add),
@@ -63,11 +72,13 @@ class _MyHomePageState extends State<MyHomePage> {
     return StreamBuilder<DocumentSnapshot>(
       stream: Firestore.instance
           .collection('requests')
-          .document('0xD214cEE4caf198a72C55b169f7AbB88Cb58dCfac')
+          .document(ownerAddress)
           .snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData || !snapshot.data.exists)
+        if (!snapshot.hasData)
           return LinearProgressIndicator();
+          else if(!snapshot.data.exists)
+            return Center(child: Text("No requests"),);
         return _buildList(
             context, UserRequestsDocument.fromSnapshot(snapshot.data));
       },
