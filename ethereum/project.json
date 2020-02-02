@@ -1,0 +1,196 @@
+{
+  "openZeppelin": {
+    "assets": [
+      {
+        "id": "tokentimelock",
+        "name": "token/ERC20/TokenTimelock.sol",
+        "hash": "542b22d83c7a4ae64a2ca44e39670b8a3513fd19",
+        "type": "contract",
+        "dependencies": [
+          "safeerc20"
+        ],
+        "requiredParameters": {
+          "TokenTimelock": [
+            {
+              "name": "token",
+              "type": "IERC20",
+              "value": "0"
+            },
+            {
+              "name": "beneficiary",
+              "type": "address",
+              "value": "0xe9ae1C5A17c632e22d8BBAd39d7F754FdDA4e8B9"
+            },
+            {
+              "name": "releaseTime",
+              "type": "uint256",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      {
+        "id": "erc20",
+        "name": "token/ERC20/ERC20.sol",
+        "hash": "769dc140a2d41cd741e15f6d59ff565d829a31d3",
+        "type": "contract",
+        "dependencies": [
+          "context",
+          "ierc20",
+          "safemath"
+        ]
+      },
+      {
+        "id": "context",
+        "name": "GSN/Context.sol",
+        "hash": "107729583750206885773cee54febb5a1d73fd0e",
+        "type": "abstractContract"
+      },
+      {
+        "id": "ierc20",
+        "name": "token/ERC20/IERC20.sol",
+        "hash": "bf5245ff067885c12863634b78733d73702775b0",
+        "type": "interface"
+      },
+      {
+        "id": "safemath",
+        "name": "math/SafeMath.sol",
+        "hash": "e7091fb2265a588ca7cd6557fdd92a4823f3f157",
+        "type": "library"
+      },
+      {
+        "id": "erc20burnable",
+        "name": "token/ERC20/ERC20Burnable.sol",
+        "hash": "e58b72b25c8559c200dfc852da6f39ff135995f3",
+        "type": "contract",
+        "dependencies": [
+          "context",
+          "erc20"
+        ]
+      },
+      {
+        "id": "erc20capped",
+        "name": "token/ERC20/ERC20Capped.sol",
+        "hash": "17efca0c482307ca46ce782ce4d50d83fe644e14",
+        "type": "contract",
+        "dependencies": [
+          "erc20mintable"
+        ],
+        "requiredParameters": {
+          "ERC20Capped": [
+            {
+              "name": "cap",
+              "type": "uint256",
+              "value": "10000"
+            }
+          ]
+        }
+      },
+      {
+        "id": "erc20mintable",
+        "name": "token/ERC20/ERC20Mintable.sol",
+        "hash": "d2fd5b73716046d60baa9bffa78b0d45f0946f22",
+        "type": "contract",
+        "dependencies": [
+          "erc20",
+          "minterrole"
+        ]
+      },
+      {
+        "id": "minterrole",
+        "name": "access/roles/MinterRole.sol",
+        "hash": "f881e3a739890aea9e22b5750002e742cf6c74de",
+        "type": "abstractContract",
+        "dependencies": [
+          "context",
+          "roles"
+        ]
+      },
+      {
+        "id": "roles",
+        "name": "access/Roles.sol",
+        "hash": "5f3eff6aeede298f88aa400967d75f993b2c7e56",
+        "type": "library"
+      },
+      {
+        "id": "erc20detailed",
+        "name": "token/ERC20/ERC20Detailed.sol",
+        "hash": "61d4ab922d7d17332654fd0db39b1865505c1c40",
+        "type": "abstractContract",
+        "dependencies": [
+          "ierc20"
+        ],
+        "requiredParameters": {
+          "ERC20Detailed": [
+            {
+              "name": "name",
+              "type": "string",
+              "value": "Vacation Token"
+            },
+            {
+              "name": "symbol",
+              "type": "string",
+              "value": "VTK"
+            },
+            {
+              "name": "decimals",
+              "type": "uint8",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      {
+        "id": "erc20pausable",
+        "name": "token/ERC20/ERC20Pausable.sol",
+        "hash": "5e8641ebc180c828192530d51c583e7f96b02e2b",
+        "type": "contract",
+        "dependencies": [
+          "erc20",
+          "pausable"
+        ]
+      },
+      {
+        "id": "pausable",
+        "name": "lifecycle/Pausable.sol",
+        "hash": "77d11e33b6c906b9b0a09a43004859b8711f6ef3",
+        "type": "abstractContract",
+        "dependencies": [
+          "context",
+          "pauserrole"
+        ]
+      },
+      {
+        "id": "pauserrole",
+        "name": "access/roles/PauserRole.sol",
+        "hash": "6ad238402b4fe6f14d065a94880650a75a7012be",
+        "type": "abstractContract",
+        "dependencies": [
+          "context",
+          "roles"
+        ]
+      },
+      {
+        "id": "safeerc20",
+        "name": "token/ERC20/SafeERC20.sol",
+        "hash": "8cbc7b2f74d05e31a95d7f8b0a1ee18b9d5031c7",
+        "type": "library",
+        "dependencies": [
+          "ierc20",
+          "safemath",
+          "address"
+        ]
+      },
+      {
+        "id": "address",
+        "name": "utils/Address.sol",
+        "hash": "61830f0b161628c6fa7e6736140949150a2c0c80",
+        "type": "library"
+      }
+    ],
+    "version": "2.4.0",
+    "categories": [
+      "token/ERC20"
+    ]
+  }
+}

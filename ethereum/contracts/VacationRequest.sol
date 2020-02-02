@@ -24,9 +24,9 @@ contract VacationRequest {
 
     //Events
     event RequestCreated(address indexed _owner);
-    event RequestCancelled(address indexed _owner);
+    event RequestCancelled(address indexed _owner, string _reason);
     event RequestApproved(address indexed _owner, address indexed _manager);
-    event RequestRejected(address indexed _owner, address indexed _manager);
+    event RequestRejected(address indexed _owner, address indexed _manager, string _reason);
 
     // Constructor
     constructor(address _parentContractAddress) public {
