@@ -136,7 +136,7 @@ class VacationRequest {
   VacationRequest.fromMap(Map<String, dynamic> map, {this.reference})
       : assert(map['address'] != null),
         address = map['address'],
-        events = List.from(map['events']);
+        events = map['events'] != null ? List.from(map['events']) : [];
 
   VacationRequest.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data, reference: snapshot.reference);
