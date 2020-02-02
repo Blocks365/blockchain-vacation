@@ -63,10 +63,11 @@ class _MyHomePageState extends State<MyHomePage> {
     return StreamBuilder<DocumentSnapshot>(
       stream: Firestore.instance
           .collection('requests')
-          .document('0xBeB8732bf6da14d06c7deF6034396D7971Fb4255')
+          .document('0xD214cEE4caf198a72C55b169f7AbB88Cb58dCfac')
           .snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) return LinearProgressIndicator();
+        if (!snapshot.hasData || !snapshot.data.exists)
+          return LinearProgressIndicator();
         return _buildList(
             context, UserRequestsDocument.fromSnapshot(snapshot.data));
       },
@@ -107,8 +108,10 @@ class UserRequestsDocument {
   final DocumentReference reference;
   final List<VacationRequest> requests;
 
-  static List<VacationRequest> convert(List<dynamic> data, DocumentReference ref) {
-    var mapped = data.map((x) => VacationRequest.fromMap(Map.from(x), reference: ref));
+  static List<VacationRequest> convert(
+      List<dynamic> data, DocumentReference ref) {
+    var mapped =
+        data.map((x) => VacationRequest.fromMap(Map.from(x), reference: ref));
     var list = mapped.toList();
     return list;
   }
@@ -125,18 +128,15 @@ class UserRequestsDocument {
 class VacationRequest {
   final String address;
   final List events;
-  String get status => 
-  (events != null && events.length > 0)
-      ? events[events.length - 1]
-      : 'None';
+  String get status => (events != null && events.length > 0)
+      ? events[events.length - 1]['event']
+      : 'Empty event name';
   final DocumentReference reference;
 
   VacationRequest.fromMap(Map<String, dynamic> map, {this.reference})
-  : 
-    assert(map['address'] != null),
-    address = map['address'],
-    events = []
-  ;
+      : assert(map['address'] != null),
+        address = map['address'],
+        events = List.from(map['events']);
 
   VacationRequest.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data, reference: snapshot.reference);
