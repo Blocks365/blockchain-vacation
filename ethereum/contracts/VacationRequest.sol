@@ -97,7 +97,7 @@ contract VacationRequest {
         }
 
         state = StateType.Cancelled;
-        emit RequestCancelled(owner);
+        emit RequestCancelled(owner, "calcelled");
     }
 
     function reject()
@@ -106,7 +106,7 @@ contract VacationRequest {
         inState(StateType.PendingApproval)
     {
         state = StateType.Draft;
-        emit RequestRejected(owner, manager);
+        emit RequestRejected(owner, manager, "rejected");
     }
 
     function submit(address _manager)

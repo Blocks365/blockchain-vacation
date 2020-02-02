@@ -12,17 +12,17 @@ contract VacationManager is ERC20, ERC20Detailed  {
     address mantainer;
 
     //constructor
-    constructor(uint256 initialSupply)
+    constructor()
         ERC20Detailed("Vacation", "VTK", 0)
         public
     {
         mantainer = msg.sender;
     }
 
-    function addVacationTokens(address employee, unit265 _amount)
+    function addVacationTokens(address employee, uint8 _amount)
         public
     {
-        require(state == StateType.Provisioned, "Wrong state");
+        require(State == StateType.Provisioned, "Wrong state");
         require(msg.sender == mantainer, "Only owner can call this function");
         require(_amount > 0, "Only positive amount");
 
@@ -32,9 +32,9 @@ contract VacationManager is ERC20, ERC20Detailed  {
     function Terminate()
         public
     {
-        require(state == StateType.Provisioned, "Wrong state");
+        require(State == StateType.Provisioned, "Wrong state");
         require(msg.sender == mantainer, "Only owner can call this function");
 
-        state = StateType.Terminated;
+        State = StateType.Terminated;
     }
 }
