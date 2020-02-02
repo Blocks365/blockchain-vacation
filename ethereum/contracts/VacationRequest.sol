@@ -1,35 +1,38 @@
 pragma solidity >=0.5.0 <0.7.0;
-pragma experimental ABIEncoderV2;
+
+import "./VacationManager.sol";
 
 contract VacationRequest {
     //Set of States
-    enum StateType {Draft, PendingApproval, Accepted, Rejected, Cancelled}
+    enum StateType {Draft, PendingApproval, Approved, Cancelled}
 
     //date struct for easy coding
     struct VacationDay {
-        uint8 day;
-        uint8 month;
-        uint16 year;
-        uint8 amount;
+        uint8 day; // Day of vacation 0 - 6
+        uint8 month; // Month of year
+        uint16 year; // Year
+        uint8 amount; // amount in Hours (mod 4) and max is 8 (1 day)
     }
 
     //List of properties
     StateType public state = StateType.Draft; // Initial State
     address public owner; // IO
     address public manager; // IM
+    address public parentContract; // PC
     mapping(uint16 => VacationDay) public vacationDays; // Dates of vacation days appplying for
-    uint16 public vacationDaysCount = 0; // Totoal number of vacation days for this request
+    uint16 public vacationHoursCount = 0; // Totoal number of vacation hours for this request
 
     //Events
     event RequestCreated(address indexed _owner);
     event RequestCancelled(address indexed _owner);
-
     event RequestApproved(address indexed _owner, address indexed _manager);
     event RequestRejected(address indexed _owner, address indexed _manager);
 
     // Constructor
-    constructor() public {
+    constructor(address _parentContractAddress) public {
+        parentContract = _parentContractAddress;
         owner = msg.sender;
+
         emit RequestCreated(msg.sender);
     }
 
@@ -43,58 +46,53 @@ contract VacationRequest {
         _;
     }
 
-    modifier onlyPendingApproval {
+    modifier inState(StateType _state) {
         require(
-            state == StateType.PendingApproval,
-            "Only Status Pending Approval can be rejected"
+            state == _state,
+            "Invalid state."
         );
         _;
     }
 
-    modifier onlyDraftPending {
-        require(
-            state == StateType.Draft || state == StateType.PendingApproval,
-            "Cannot modify request"
-        );
-        _;
-    }
-
-    modifier onlyDraft {
-        require(state == StateType.Draft, "Cannot modify request");
-        _;
-    }
-
-    function upsertDay(VacationDay memory _day)
+    function upsertDay(uint8 _day, uint8 _month, uint16 _year, uint8 _amount)
         public
         onlyOwner
-        onlyDraftPending
+        inState(StateType.Draft)
     {
         //todo: amount should  be mod 4
-        uint16 dayKey = calcKey(_day);
+        uint16 dayKey = calcKey(_day, _month, _year);
 
-        if (vacationDays[dayKey].year == 0) {
-            vacationDaysCount++;
-        }
+        vacationHoursCount -= vacationDays[dayKey].amount; //Substract current hour, if exists
+        vacationHoursCount += _amount; //Add hours
 
-        vacationDays[dayKey] = _day;
+        vacationDays[dayKey] = VacationDay({
+            day: _day,
+            month: _month,
+            year: _year,
+            amount: _amount
+        });
     }
 
-    function removeDay(VacationDay memory _day)
+    function removeDay(uint8 _day, uint8 _month, uint16 _year)
         public
         onlyOwner
-        onlyDraftPending
+        inState(StateType.Draft)
     {
-        uint16 dayKey = calcKey(_day);
+        uint16 dayKey = calcKey(_day, _month, _year);
 
         if (vacationDays[dayKey].year > 0) {
-            vacationDaysCount--;
+            vacationHoursCount -= vacationDays[dayKey].amount;
         }
 
         delete vacationDays[dayKey];
     }
 
-    function cancel() public onlyOwner {
-        if (state == StateType.Accepted) {
+    //Transformation Functions - The only 4 functions that can change state
+    function cancel()
+        public
+        onlyOwner
+    {
+        if (state == StateType.Approved) {
             revert("Cannot cancel an accepted request");
         }
 
@@ -102,31 +100,55 @@ contract VacationRequest {
         emit RequestCancelled(owner);
     }
 
-    function reject() public onlyPendingApproval onlyManager {
-        state = StateType.Rejected;
+    function reject()
+        public
+        onlyManager
+        inState(StateType.PendingApproval)
+    {
+        state = StateType.Draft;
         emit RequestRejected(owner, manager);
     }
 
-    function submit(address _manager) public onlyOwner onlyDraft {
+    function submit(address _manager)
+        public
+        onlyOwner
+        inState(StateType.Draft)
+    {
         if (_manager == owner) {
             revert("Cannot submit request to yourself");
         }
 
-        if (vacationDaysCount == 0) {
+        if (vacationHoursCount == 0) {
             revert("No vacation days added. Cannot submit empty request");
         }
+
+        // Check for balance
+        //VacationManager vacationManager = VacationManager(parentContract);
+
+        // check owners balance
+        //if (!vacationManager.HasBalance(owner, vacationHoursCount)) {
+        //    revert();
+        //}
 
         state = StateType.PendingApproval;
         manager = _manager;
     }
 
-    function approve() public onlyPendingApproval onlyManager {
-        state = StateType.Accepted;
+    function approve()
+        public
+        onlyManager
+        inState(StateType.PendingApproval)
+    {
+        state = StateType.Approved;
         emit RequestApproved(owner, manager);
     }
 
-    function calcKey(VacationDay memory _day) internal pure returns (uint16) {
-        uint16 dayKey = (_day.year * 12 * 31) + (_day.month * 31) + _day.day;
+    function calcKey(uint8 _day, uint8 _month, uint16 _year)
+        internal
+        pure
+        returns (uint16)
+    {
+        uint16 dayKey = (_year * 12 * 31) + (_month * 31) + _day;
         return dayKey;
     }
 }
