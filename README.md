@@ -22,11 +22,10 @@ States
 
 | Name  |  Description |
 |----------|-------------------------------------------------------------------------------------------|
-| Draft  | The state that occurs when a vacation request is being created by the employee.  |
+| Draft  | The state that occurs when a vacation request is being created by the employee or has been rejected by the manager.  |
 | Pending Approval  | The state that occurs after a request has been submitted for approval by the employee.  |
 | Approved  | The state that occurs after a request has been approved by the manager.  |
-| Rejected  | The state that occurs after a request has been denied by the manager.  |
-| Cancelled  | The state that occurs after a vacation request has been cancelled by the manager or the employee  |
+| Cancelled  | The state that occurs after a vacation request has been cancelled by the employee  |
 
 Workflow Details
 ----------------
@@ -36,8 +35,8 @@ Workflow Details
 - An instance of the Vacation Request application's workflow starts in the Draft state when an Employee creates a new request.  
 - The instance transitions to the Pending Approval state when an Employee submits the request.
 - If the manager approves the request, the instance goes to the Approved state
-- If the manager rejects the request, the instance goes to the Rejected state
-- At any case the employee can cancel the request
+- If the manager rejects the request, the instance goes back to the Draft state
+- While a contract is in Draft or Pending Approval state the employee can cancel the request
 
 How to Run
 ----------
