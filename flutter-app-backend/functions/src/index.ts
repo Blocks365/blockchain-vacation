@@ -17,7 +17,7 @@ admin.initializeApp(functions.config().firebase);
 const db = admin.firestore();
 
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
-const address = "0x38a6DA8DD79d50c517aeBBB0aF96233428e01E51";
+const address = "0xD214cEE4caf198a72C55b169f7AbB88Cb58dCfac";
 const abiItems: AbiItem[] = contractData.abi as AbiItem[];
 
 const VacationRequest = new web3.eth.Contract(abiItems);
@@ -34,11 +34,24 @@ export const test = functions.https.onRequest(async (req, res) => {
         gas: estimated
     });
 
-    const docRef = db.collection('requests').doc(currentDeployment.options.address);
     const owner = await currentDeployment.methods.owner().call();
+
+    const docRef = db.collection('requests').doc(address);
+    const current = (await docRef.get()).data() || {};
+    const requests = current.requests || [];
     const document = docRef.set({
+        ...current,
         owner: owner,
-        address: currentDeployment.options.address
+        username: 'Hardcoded Name',
+        requests: [
+            ...requests,
+            {
+                address: currentDeployment.options.address
+            }
+        ]
+
+    }, {
+        merge: true
     });
 
     res.send(`Data: ${document}`);
@@ -46,26 +59,41 @@ export const test = functions.https.onRequest(async (req, res) => {
 
 export const update = functions.https.onRequest(async (req, res) => {
 
-    const updateDoc = async (request: DocumentReference) => {
-        const requestData = (await request.get()).data()
-        if (!requestData){
-            res.send('not found')
-            return
-        }
-        const contractRef = new web3.eth.Contract(abiItems, requestData.address);
-        console.log('Updating', contractRef.options.address, requestData.address)
+    const updateRequest = async(request: any) =>{
+        const contractRef = new web3.eth.Contract(abiItems, request.address);
+        console.log('Updating', contractRef.options.address, request.address)
         const events = await contractRef.getPastEvents("allEvents", {
             fromBlock: 0,
             toBlock: 'latest'
         });
         console.log('Events', events.length)
-        const updatedObject = {
-            ...requestData,
-            events: events.map(x => ({
-                event: x.event
+        return {
+            ...request,
+            yes: true,
+            events: events.map(x=>({
+                ...x,
+                returnValues: {
+                    ...x.returnValues
+                }
             }))
+        }
+    }
+
+    const updateDoc = async (request: DocumentReference) => {
+        console.log('updateDoc', request.id)
+        const requestData = (await request.get()).data()
+        if (!requestData){
+            res.send('not found')
+            return
+        }
+        const requestTask = (requestData.requests as Array<any>).map(updateRequest)
+        const requestEvents = await Promise.all(requestTask)
+        const updatedObject = {
+            requests: requestEvents
         };
-        await request.set(updatedObject)
+        await request.set(updatedObject, {
+             merge: true
+        })
     }
     if (req.query.address) {
         const request = await db.collection('requests').doc(req.query.address);
