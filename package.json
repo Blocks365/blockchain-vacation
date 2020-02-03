@@ -1,0 +1,22 @@
+{
+  "name": "blockchain-vacation",
+  "version": "1.0.0",
+  "description": "Vacation Request using Blockchain ==================================",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Blocks365/blockchain-vacation.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Blocks365/blockchain-vacation/issues"
+  },
+  "homepage": "https://github.com/Blocks365/blockchain-vacation#readme",
+  "devDependencies": {
+    "concurrently": "^5.1.0"
+  }
+}

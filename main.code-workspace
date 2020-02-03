@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"path": ".",
+			"name": "Root"
+		},
+		{
+			"path": "etherium",
+			"name": "Etherium"
+		},
+		{
+			"path": "flutter-app-backend",
+			"name": "Backend"
+		},
+		{
+			"path": "flutter-app",
+			"name": "Mobile App"
+		},
+	],
+	"settings": {}
+}
