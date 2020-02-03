@@ -5,8 +5,8 @@
 			"name": "Root"
 		},
 		{
-			"path": "etherium",
-			"name": "Etherium"
+			"path": "ethereum",
+			"name": "Ethereum"
 		},
 		{
 			"path": "flutter-app-backend",

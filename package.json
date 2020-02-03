@@ -4,7 +4,10 @@
   "description": "Vacation Request using Blockchain ==================================",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:ganache": "cd ethereum && npx ganache-cli",
+    "start:backend-emulator": "cd flutter-app-backend && firebase emulators:start",
+    "start:backend-watch": "cd flutter-app-backend/functions && npm run watch",
+    "start" : "concurrently \"npm:start:ganache\" \"npm:start:backend-watch\" \"npm:start-backend-emulator\" "
   },
   "repository": {
     "type": "git",
