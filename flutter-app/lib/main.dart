@@ -1,5 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:vacationrequest/pages/login.dart';
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -7,7 +11,27 @@ void main() async {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool isLoggedIn;
+
+  void checkUser() async {
+    var user = await _auth.currentUser();
+    this.setState(() {
+      isLoggedIn = user != null && user.uid != null;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkUser();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -15,9 +39,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/',
+      initialRoute: isLoggedIn ? '/' : '/login',
       routes: {
         '/': (context) => MyHomePage(title: "First page"),
+        '/login': (context) => LoginPage(),
         '/second': (context) => MyHomePage(title: "Second page"),
       },
     );
@@ -77,8 +102,10 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (context, snapshot) {
         if (!snapshot.hasData)
           return LinearProgressIndicator();
-          else if(!snapshot.data.exists)
-            return Center(child: Text("No requests"),);
+        else if (!snapshot.data.exists)
+          return Center(
+            child: Text("No requests"),
+          );
         return _buildList(
             context, UserRequestsDocument.fromSnapshot(snapshot.data));
       },
