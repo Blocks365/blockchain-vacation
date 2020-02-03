@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:vacationrequest/pages/login.dart';
+import 'package:vacationrequest/pages/profile.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -43,7 +44,7 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/': (context) => MyHomePage(title: "First page"),
         '/login': (context) => LoginPage(),
-        '/second': (context) => MyHomePage(title: "Second page"),
+        '/profile': (context) => ProfilePage()
       },
     );
   }
@@ -81,6 +82,14 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.person),
+            onPressed: () async {
+              await Navigator.of(context).popAndPushNamed('/profile');
+            },
+          )
+        ],
       ),
       body: _buildBody(context),
       floatingActionButton: FloatingActionButton(

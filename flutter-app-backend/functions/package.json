@@ -4,6 +4,7 @@
     "lint": "tslint --project tsconfig.json",
     "build": "tsc",
     "watch": "tsc -w",
+    "watch:preserve": "tsc -w --preserveWatchOutput",
     "serve": "npm run build && firebase serve --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",

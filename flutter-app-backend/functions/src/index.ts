@@ -1,11 +1,8 @@
 import * as functions from 'firebase-functions';
-import admin from 'firebase-admin';
 import { DocumentReference } from '@google-cloud/firestore'
 import { fromAddress } from './contracts/VacationRequest';
-
-admin.initializeApp(functions.config().firebase);
-
-const db = admin.firestore();
+import { VacationRequestCommand } from './commands/VacationRequest'
+import { db } from './store/firestore'
 
 // const address = "0xD214cEE4caf198a72C55b169f7AbB88Cb58dCfac";
 
@@ -62,21 +59,24 @@ export const update = functions.https.onRequest(async (req, res) => {
 })
 
 export const get = functions.https.onRequest(async (req, res) => {
+    console.log('starting command request')
     const documents = await db.collection('requests').get()
     const data = documents.docs.map(x => x.data());
+
     res.send(data)
 })
 
 export const onCommand = functions.firestore.document('requests/{owneraddress}/commands/{id}').onCreate(async (snapshot, context) => {
+    const owneraddress = context.params.owneraddress;
     console.log('Owner', context.params.owneraddress, 'doc id', context.params.id);
-    if(snapshot.exists ){
-        const commandData =  snapshot.data();
-        if(!commandData){
+    if (snapshot.exists) {
+        const commandData = snapshot.data();
+        if (!commandData) {
             return;
         }
         console.log('COMMAND', commandData.command);
-        if(commandData.command === 'VacationRequest'){
-            
+        if (commandData.command === 'VacationRequest') {
+            VacationRequestCommand(owneraddress);
         }
     }
 })

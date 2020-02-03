@@ -6,8 +6,8 @@
   "scripts": {
     "start:ganache": "cd ethereum && npx ganache-cli",
     "start:backend-emulator": "cd flutter-app-backend && firebase emulators:start",
-    "start:backend-watch": "cd flutter-app-backend/functions && npm run watch",
-    "start" : "concurrently \"npm:start:ganache\" \"npm:start:backend-watch\" \"npm:start-backend-emulator\" "
+    "start:backend-watch": "cd flutter-app-backend/functions && npm run watch:preserve",
+    "start" : "concurrently \"npm:start:backend-watch\" \"npm:start:ganache\" \"npm:start:backend-emulator\" "
   },
   "repository": {
     "type": "git",

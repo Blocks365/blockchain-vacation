@@ -1,9 +1,7 @@
 import { VacationRequestContract, VacationRequestContractData } from '../contracts/VacationRequest'
-import admin = require('firebase-admin');
+import { db } from '../store/firestore'
 
-const db = admin.firestore();
-
-export async function  VacationRequestCommand(address: string): Promise<void> {
+export async function VacationRequestCommand(address: string): Promise<void> {
     const deployment = await VacationRequestContract.deploy({
         data: VacationRequestContractData.bytecode
     })
