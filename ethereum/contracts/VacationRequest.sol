@@ -122,12 +122,17 @@ contract VacationRequest {
             revert("No vacation days added. Cannot submit empty request");
         }
 
-        // Check for balance
+        //Check the parent contract: VacationManager for balance and manager validation
         //VacationManager vacationManager = VacationManager(parentContract);
 
-        // check owners balance
+        //Check owners balance
         //if (!vacationManager.HasBalance(owner, vacationHoursCount)) {
-        //    revert();
+        //    revert("Insufficient VTK token balace to submit the request");
+        //}
+
+        //Check if _manager address exists in VacatinManager's manager list
+        //if (!vacationManager.IsManager(_manager)) {
+        //    revert("Managers address is not on the list of manager addresses in VacationManager contract");
         //}
 
         state = StateType.PendingApproval;
@@ -139,6 +144,16 @@ contract VacationRequest {
         onlyManager
         inState(StateType.PendingApproval)
     {
+        //Deduct the VTK token(s) from owners (Employees) balance
+        //VacationManager vacationManager = VacationManager(parentContract);
+
+        //Check owners (Employees) balance before approval before approval
+        //if (!vacationManager.HasBalance(owner, vacationHoursCount)) {
+        //    revert("The employee has insufficient VTK token funds");
+        //}
+
+        //vacationManager.deductVacationTokens(owner, vacationHoursCount);
+
         state = StateType.Approved;
         emit RequestApproved(owner, manager);
     }

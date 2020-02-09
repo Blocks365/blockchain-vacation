@@ -19,20 +19,28 @@ contract VacationManager is ERC20, ERC20Detailed  {
         mantainer = msg.sender;
     }
 
-    function addVacationTokens(address employee, uint8 _amount)
+    function addVacationTokens(address _employee, uint8 _amount)
         public
     {
-        require(State == StateType.Provisioned, "Wrong state");
+        require(State == StateType.Provisioned, "State is not 'Provisioned'");
         require(msg.sender == mantainer, "Only owner can call this function");
         require(_amount > 0, "Only positive amount");
 
-        _mint(employee, _amount);
+        _mint(_employee, _amount);
     }
+
+    //function deductVacationTokens(address _employee, uint8 _amount)
+
+    //function assignManager(address _manager)
+
+    //function IsManager(address _manager)
+
+    //function HasBalance(address _employee, uint8 _amount)
 
     function Terminate()
         public
     {
-        require(State == StateType.Provisioned, "Wrong state");
+        require(State == StateType.Provisioned, "State is not 'Provisioned'");
         require(msg.sender == mantainer, "Only owner can call this function");
 
         State = StateType.Terminated;
