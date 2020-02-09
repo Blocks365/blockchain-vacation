@@ -11,7 +11,7 @@ contract VacationRequest {
         uint8 day; // Day of vacation 0 - 6
         uint8 month; // Month of year
         uint16 year; // Year
-        uint8 amount; // amount in Hours (mod 4) and max is 8 (1 day)
+        uint256 amount; // amount in Hours (mod 4) and max is 8 (1 day)
     }
 
     //List of properties
@@ -20,20 +20,21 @@ contract VacationRequest {
     address public manager; // IM
     address public parentContract; // PC
     mapping(uint16 => VacationDay) public vacationDays; // Dates of vacation days appplying for
-    uint16 public vacationHoursCount = 0; // Totoal number of vacation hours for this request
+    uint256 public vacationHoursCount = 0; // Totoal number of vacation hours for this request
 
     //Events
-    event RequestCreated(address indexed _owner);
-    event RequestCancelled(address indexed _owner, string _reason);
-    event RequestApproved(address indexed _owner, address indexed _manager);
-    event RequestRejected(address indexed _owner, address indexed _manager, string _reason);
+    event RequestCreated(address indexed _owner, uint256 _amount);
+    event RequestSubmitted(address indexed _owner, address indexed _manager, uint256 _amount);
+    event RequestCancelled(address indexed _owner, uint256 _amount, string _reason);
+    event RequestApproved(address indexed _owner, address indexed _manager, uint256 _amount);
+    event RequestRejected(address indexed _owner, address indexed _manager, uint256 _amount, string _reason);
 
     // Constructor
     constructor(address _parentContractAddress) public {
         parentContract = _parentContractAddress;
         owner = msg.sender;
 
-        emit RequestCreated(msg.sender);
+        emit RequestCreated(owner, vacationHoursCount);
     }
 
     modifier onlyOwner {
@@ -47,14 +48,11 @@ contract VacationRequest {
     }
 
     modifier inState(StateType _state) {
-        require(
-            state == _state,
-            "Invalid state."
-        );
+        require(state == _state, "Invalid state.");
         _;
     }
 
-    function upsertDay(uint8 _day, uint8 _month, uint16 _year, uint8 _amount)
+    function upsertDay(uint8 _day, uint8 _month, uint16 _year, uint256 _amount)
         public
         onlyOwner
         inState(StateType.Draft)
@@ -88,27 +86,6 @@ contract VacationRequest {
     }
 
     //Transformation Functions - The only 4 functions that can change state
-    function cancel()
-        public
-        onlyOwner
-    {
-        if (state == StateType.Approved) {
-            revert("Cannot cancel an accepted request");
-        }
-
-        state = StateType.Cancelled;
-        emit RequestCancelled(owner, "calcelled");
-    }
-
-    function reject()
-        public
-        onlyManager
-        inState(StateType.PendingApproval)
-    {
-        state = StateType.Draft;
-        emit RequestRejected(owner, manager, "rejected");
-    }
-
     function submit(address _manager)
         public
         onlyOwner
@@ -123,20 +100,33 @@ contract VacationRequest {
         }
 
         //Check the parent contract: VacationManager for balance and manager validation
-        //VacationManager vacationManager = VacationManager(parentContract);
+        VacationManager vacationManager = VacationManager(parentContract);
 
         //Check owners balance
-        //if (!vacationManager.HasBalance(owner, vacationHoursCount)) {
-        //    revert("Insufficient VTK token balace to submit the request");
-        //}
+        if (!vacationManager.HasEnoughBalance(owner, vacationHoursCount)) {
+            revert("Insufficient VTK token balace to submit the request");
+        }
 
         //Check if _manager address exists in VacatinManager's manager list
-        //if (!vacationManager.IsManager(_manager)) {
-        //    revert("Managers address is not on the list of manager addresses in VacationManager contract");
-        //}
+        if (!vacationManager.IsManager(_manager)) {
+            revert("Managers address is not in the list of manager addresses");
+        }
 
         state = StateType.PendingApproval;
         manager = _manager;
+        emit RequestSubmitted(owner, manager, vacationHoursCount);
+    }
+
+    function cancel(string memory _reason)
+        public
+        onlyOwner
+    {
+        if (state == StateType.Approved) {
+            revert("Cannot cancel an accepted request");
+        }
+
+        state = StateType.Cancelled;
+        emit RequestCancelled(owner, vacationHoursCount, _reason);
     }
 
     function approve()
@@ -145,17 +135,26 @@ contract VacationRequest {
         inState(StateType.PendingApproval)
     {
         //Deduct the VTK token(s) from owners (Employees) balance
-        //VacationManager vacationManager = VacationManager(parentContract);
+        VacationManager vacationManager = VacationManager(parentContract);
 
         //Check owners (Employees) balance before approval before approval
-        //if (!vacationManager.HasBalance(owner, vacationHoursCount)) {
-        //    revert("The employee has insufficient VTK token funds");
-        //}
+        if (!vacationManager.HasEnoughBalance(owner, vacationHoursCount)) {
+            revert("The employee has insufficient VTK token funds");
+        }
 
-        //vacationManager.deductVacationTokens(owner, vacationHoursCount);
+        vacationManager.BurnVacationTokens(owner, vacationHoursCount);
 
         state = StateType.Approved;
-        emit RequestApproved(owner, manager);
+        emit RequestApproved(owner, manager, vacationHoursCount);
+    }
+
+    function reject(string memory _reason)
+        public
+        onlyManager
+        inState(StateType.PendingApproval)
+    {
+        state = StateType.Draft;
+        emit RequestRejected(owner, manager, vacationHoursCount, _reason);
     }
 
     function calcKey(uint8 _day, uint8 _month, uint16 _year)

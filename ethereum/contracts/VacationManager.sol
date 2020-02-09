@@ -11,6 +11,8 @@ contract VacationManager is ERC20, ERC20Detailed  {
     StateType public State = StateType.Provisioned;
     address mantainer;
 
+    mapping (address => bool) public managerAddresses;
+
     //constructor
     constructor()
         ERC20Detailed("Vacation", "VTK", 0)
@@ -19,7 +21,7 @@ contract VacationManager is ERC20, ERC20Detailed  {
         mantainer = msg.sender;
     }
 
-    function addVacationTokens(address _employee, uint8 _amount)
+    function AddVacationTokens(address _employee, uint256 _amount)
         public
     {
         require(State == StateType.Provisioned, "State is not 'Provisioned'");
@@ -29,13 +31,40 @@ contract VacationManager is ERC20, ERC20Detailed  {
         _mint(_employee, _amount);
     }
 
-    //function deductVacationTokens(address _employee, uint8 _amount)
+    function BurnVacationTokens(address _employee, uint256 _amount)
+        public
+    {
+        require(State == StateType.Provisioned, "State is not 'Provisioned'");
+        //ToDo: Make sure only the child VacationRequest contract can call this...
 
-    //function assignManager(address _manager)
+        require(_amount < 0, "Only positive amount");
 
-    //function IsManager(address _manager)
+        _burn(_employee, _amount);
+    }
 
-    //function HasBalance(address _employee, uint8 _amount)
+    function HasEnoughBalance(address _employee, uint256 _amount)
+        public
+        view
+        returns (bool)
+    {
+        return balanceOf(_employee) >= _amount;
+    }
+
+    function AssignManager(address _manager)
+        public
+    {
+        managerAddresses[_manager] = true;
+    }
+
+    function IsManager(address _manager)
+        public
+        view
+        returns (bool)
+    {
+        return managerAddresses[_manager];
+    }
+
+
 
     function Terminate()
         public
