@@ -8,4 +8,5 @@ module.exports = function(deployer) {
   deployer.deploy(MetaCoin);
 
   deployer.deploy(VacationRequest);
+  deployer.deploy(VacationManagers);
 };
