@@ -15,13 +15,13 @@ contract VacationManager is ERC20, ERC20Detailed  {
 
     //constructor
     constructor()
-        ERC20Detailed("Vacation", "VTK", 0)
+        ERC20Detailed("Vacation Token", "VTK", 0)
         public
     {
         mantainer = msg.sender;
     }
 
-    function AddVacationTokens(address _employee, uint256 _amount)
+    function addVacationTokens(address _employee, uint256 _amount)
         public
     {
         require(State == StateType.Provisioned, "State is not 'Provisioned'");
@@ -31,18 +31,18 @@ contract VacationManager is ERC20, ERC20Detailed  {
         _mint(_employee, _amount);
     }
 
-    function BurnVacationTokens(address _employee, uint256 _amount)
+    function burnVacationTokens(address _employee, uint256 _amount)
         public
     {
         require(State == StateType.Provisioned, "State is not 'Provisioned'");
-        //ToDo: Make sure only the child VacationRequest contract can call this...
+        //ToDo: Make sure only the VacationRequest Manager can call this, and only after his approval...
 
         require(_amount < 0, "Only positive amount");
 
         _burn(_employee, _amount);
     }
 
-    function HasEnoughBalance(address _employee, uint256 _amount)
+    function hasEnoughBalance(address _employee, uint256 _amount)
         public
         view
         returns (bool)
@@ -50,13 +50,13 @@ contract VacationManager is ERC20, ERC20Detailed  {
         return balanceOf(_employee) >= _amount;
     }
 
-    function AssignManager(address _manager)
+    function assignManager(address _manager)
         public
     {
         managerAddresses[_manager] = true;
     }
 
-    function IsManager(address _manager)
+    function isManager(address _manager)
         public
         view
         returns (bool)
@@ -64,9 +64,7 @@ contract VacationManager is ERC20, ERC20Detailed  {
         return managerAddresses[_manager];
     }
 
-
-
-    function Terminate()
+    function terminate()
         public
     {
         require(State == StateType.Provisioned, "State is not 'Provisioned'");
