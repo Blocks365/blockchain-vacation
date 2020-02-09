@@ -12,7 +12,7 @@ contract VacationManager is ERC20, ERC20Detailed  {
     address mantainer;
 
     mapping (address => bool) public managerAddresses;
-
+    mapping (address => address) public vacationRequestManagerAddresses;
     //constructor
     constructor()
         ERC20Detailed("Vacation Token", "VTK", 0)
@@ -31,13 +31,15 @@ contract VacationManager is ERC20, ERC20Detailed  {
         _mint(_employee, _amount);
     }
 
-    function burnVacationTokens(address _employee, uint256 _amount)
+    function burnVacationTokens(address _vacationRequest, address _caller, address _employee, uint256 _amount)
         public
     {
         require(State == StateType.Provisioned, "State is not 'Provisioned'");
-        //ToDo: Make sure only the VacationRequest Manager can call this, and only after his approval...
-
         require(_amount < 0, "Only positive amount");
+        if(vacationRequestManagerAddresses[_vacationRequest] != _caller)
+        {
+            revert("Only the vacation request manager can burn tokens after approval");
+        }
 
         _burn(_employee, _amount);
     }
@@ -56,12 +58,24 @@ contract VacationManager is ERC20, ERC20Detailed  {
         managerAddresses[_manager] = true;
     }
 
+   function unassignManager(address _manager)
+        public
+    {
+        managerAddresses[_manager] = false;
+    }
+
     function isManager(address _manager)
         public
         view
         returns (bool)
     {
         return managerAddresses[_manager];
+    }
+
+    function assignVacationRequestManager(address _vacationRequest, address _manager)
+    public
+    {
+       vacationRequestManagerAddresses[_vacationRequest] = _manager;
     }
 
     function terminate()

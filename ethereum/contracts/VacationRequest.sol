@@ -101,7 +101,7 @@ contract VacationRequest {
 
         //Check the parent contract: VacationManager for balance and manager validation
         VacationManager vacationManager = VacationManager(parentContract);
-        
+
         //Check owners balance
         if (!vacationManager.hasEnoughBalance(owner, vacationHoursCount)) {
             revert("Insufficient VTK token balace to submit the request");
@@ -114,6 +114,11 @@ contract VacationRequest {
 
         state = StateType.PendingApproval;
         manager = _manager;
+
+        //Assign the vacationrequest manager in the manageer contract.
+        //We need this to ensure the manager is only one who can burn owners tokens
+        vacationManager.assignVacationRequestManager(address(this), manager);
+
         emit RequestSubmitted(owner, manager, vacationHoursCount);
     }
 
@@ -142,7 +147,7 @@ contract VacationRequest {
             revert("The employee has insufficient VTK token funds");
         }
 
-        vacationManager.burnVacationTokens(owner, vacationHoursCount);
+        vacationManager.burnVacationTokens(address(this), msg.sender, owner, vacationHoursCount);
 
         state = StateType.Approved;
         emit RequestApproved(owner, manager, vacationHoursCount);
