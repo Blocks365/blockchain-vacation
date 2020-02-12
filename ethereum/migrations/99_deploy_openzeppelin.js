@@ -10,6 +10,7 @@ var SafeERC20 = artifacts.require("SafeERC20");
 var Address = artifacts.require("Address");
 
 module.exports = deployer => {
+    /*
     deployer.deploy(SafeMath);
     deployer.deploy(Roles);
     deployer.deploy(SafeERC20);
@@ -29,4 +30,5 @@ module.exports = deployer => {
     deployer.deploy(ERC20Capped, 10000);
     deployer.deploy(ERC20Mintable);
     deployer.deploy(ERC20Pausable);
+    */
 };

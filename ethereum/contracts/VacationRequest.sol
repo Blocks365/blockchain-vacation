@@ -91,10 +91,6 @@ contract VacationRequest {
         onlyOwner
         inState(StateType.Draft)
     {
-        if (_manager == owner) {
-            revert("Cannot submit request to yourself");
-        }
-
         if (vacationHoursCount == 0) {
             revert("No vacation days added. Cannot submit empty request");
         }
