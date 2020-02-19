@@ -21,5 +21,11 @@
   "homepage": "https://github.com/Blocks365/blockchain-vacation#readme",
   "devDependencies": {
     "concurrently": "^5.1.0"
+  },
+  "dependencies": {
+    "install": "^0.13.0",
+    "npm": "^6.13.7",
+    "truffle": "^5.1.13",
+    "truffle-hdwallet-provider": "^1.0.17"
   }
 }

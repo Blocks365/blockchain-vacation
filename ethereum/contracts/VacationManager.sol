@@ -34,7 +34,7 @@ contract VacationManager is ERC20, ERC20Detailed {
         uint256 _amount
     ) public {
         require(State == StateType.Provisioned, "State is not 'Provisioned'");
-        require(_amount < 0, "Only positive amount");
+        require(_amount > 0, "Only positive amount");
         if (vacationRequestManagerAddresses[_vacationRequest] != _caller) {
             revert(
                 "Only the vacation request manager can burn tokens after approval"
