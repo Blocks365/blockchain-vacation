@@ -5,6 +5,12 @@ import { VacationRequestCommand } from './commands/VacationRequest'
 import { db } from './store/firestore'
 
 // const address = "0xD214cEE4caf198a72C55b169f7AbB88Cb58dCfac";
+VacationRequestCommand('0xD214cEE4caf198a72C55b169f7AbB88Cb58dCfac').then(x => {
+    console.log("OMG POTATO")
+})
+.catch(x=>{
+    console.log(x)
+});
 
 export const update = functions.https.onRequest(async (req, res) => {
 

@@ -2,9 +2,17 @@ import { VacationRequestContract, VacationRequestContractData } from '../contrac
 import { db } from '../store/firestore'
 
 export async function VacationRequestCommand(address: string): Promise<void> {
+    console.log('Deploying contract', VacationRequestContractData.bytecode.length)
     const deployment = await VacationRequestContract.deploy({
-        data: VacationRequestContractData.bytecode
+        data: VacationRequestContractData.bytecode,
+        arguments:[
+            '0xD214cEE4caf198a72C55b169f7AbB88Cb58dCfac'
+        ]
     })
+    if(!deployment){
+        console.log('Could not deploy contract')
+        return;
+    }
     const estimated = await deployment.estimateGas()
     const currentDeployment = await deployment.send({
         from: address,
